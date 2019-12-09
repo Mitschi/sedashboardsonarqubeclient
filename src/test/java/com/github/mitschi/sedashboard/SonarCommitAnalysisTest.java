@@ -2,6 +2,7 @@ package com.github.mitschi.sedashboard;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -14,6 +15,7 @@ public class SonarCommitAnalysisTest
      * and asserts that there are metrics extracted.
      */
     @Test
+	@Ignore
     public void SonarMetricAnalyseCommit()
     {
     	File projectSrcRoot = new File("D:\\git\\KAUA\\kaua-server");
@@ -22,9 +24,10 @@ public class SonarCommitAnalysisTest
     	// TODO: add suitable db driver dependency!
     	SonarConnectionDetails sonarConnectionDetails = new SonarConnectionDetails("jdbc:h2:tcp://localhost:9092/sonar", 
     			"" /* user */,
-    			"" /* pwd */);
+    			"" /* pwd */,
+				"http://localhost:9000" /* url */);
     	
-    	SonarCommitAnalysis sca = SonarMetricsAnalyzer.analyzeCommit(projectSrcRoot, projectBinaryRoot, sonarConnectionDetails);
+    	SonarCommitAnalysis sca = SonarMetricsAnalyzer.analyzeCommit("",projectSrcRoot, projectBinaryRoot, sonarConnectionDetails);
     	System.out.println(sca.getSonarMetrics());
     	assert(sca.getSonarMetrics() != null);
     	assert(sca.getSonarMetrics().size() == 15);

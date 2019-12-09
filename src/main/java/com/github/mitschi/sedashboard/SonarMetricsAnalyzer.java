@@ -32,7 +32,7 @@ public class SonarMetricsAnalyzer {
      * @param sonarConnectionDetails The details to connect to the Sonar
      * @return An object that contains all the metrics and analysis results of the respective revision of the project.
      */
-    public static SonarCommitAnalysis analyzeCommit(File projectSrcRoot, File projectBinaryRoot, SonarConnectionDetails sonarConnectionDetails) {
+    public static SonarCommitAnalysis analyzeCommit(String commitHash, File projectSrcRoot, File projectBinaryRoot, SonarConnectionDetails sonarConnectionDetails) {
     	
     	// start sonar runner analysis in project src root
     	EmbeddedScanner es = EmbeddedScanner.create("ScannerCli", ScannerVersion.version(), new StdOutLogOutput());
@@ -40,11 +40,11 @@ public class SonarMetricsAnalyzer {
     	String projectName = projectSrcRoot.getName();
     	Map<String, String> analysisProperties = new HashMap<>();
     	
-    	analysisProperties.put("sonar.host.url", "http://localhost:9000"); // TODO: change
+    	analysisProperties.put("sonar.host.url", sonarConnectionDetails.getSonarURL());
     	analysisProperties.put("sonar.projectBaseDir", projectSrcRoot.getAbsolutePath());
     	analysisProperties.put("sonar.projectKey", projectName);
     	analysisProperties.put("sonar.projectName", projectName);
-    	analysisProperties.put("sonar.projectVersion", projectName); // TODO: get git commit hash
+    	analysisProperties.put("sonar.projectVersion", commitHash);
     	analysisProperties.put("sonar.sources", "src");
     	
     	es.addGlobalProperties(analysisProperties);
@@ -63,7 +63,7 @@ public class SonarMetricsAnalyzer {
 		sonarCommitAnalysis.setSonarMetrics(sonarMetrics);
 		
 		if(projectBinaryRoot == null) {
-			sonarCommitAnalysis.setCouplingAndCohesionMetrics(null);
+			sonarCommitAnalysis.setCouplingAndCohesionMetrics(new HashMap<>());
 		} else {
 			// TODO: build src with eclipse jdt compiler
 			// flags: -g -preserveAllLocals
@@ -74,7 +74,7 @@ public class SonarMetricsAnalyzer {
 			Map<String, Double> cchMetrics = jra.getAggregatedMetrics(projectBinaryRoot.getAbsolutePath());
 			*/
 			
-			sonarCommitAnalysis.setCouplingAndCohesionMetrics(null);
+			sonarCommitAnalysis.setCouplingAndCohesionMetrics(new HashMap<>());
 		}
     	
         return sonarCommitAnalysis;
