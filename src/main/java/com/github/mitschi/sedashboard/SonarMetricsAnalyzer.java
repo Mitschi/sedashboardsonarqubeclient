@@ -37,6 +37,12 @@ public class SonarMetricsAnalyzer {
     	// start sonar runner analysis in project src root
     	EmbeddedScanner es = EmbeddedScanner.create("ScannerCli", ScannerVersion.version(), new StdOutLogOutput());
 
+    	if(projectBinaryRoot == null) {
+    		// create build if not exists (needed anyway for sonar analysis)
+    		File build = new File(projectSrcRoot + File.separator + "build");
+    		System.out.println("dir " + build.getAbsolutePath() + " created: " + build.mkdir());
+    	}
+    	
     	String projectName = projectSrcRoot.getName();
     	Map<String, String> analysisProperties = new HashMap<>();
     	
@@ -44,16 +50,28 @@ public class SonarMetricsAnalyzer {
     	analysisProperties.put("sonar.projectBaseDir", projectSrcRoot.getAbsolutePath());
     	analysisProperties.put("sonar.projectKey", projectName);
     	analysisProperties.put("sonar.projectName", projectName);
+
+    	analysisProperties.put("sonar.sources", ".");
+    	analysisProperties.put("sonar.java.binaries", "build");
     	analysisProperties.put("sonar.projectVersion", commitHash);
-    	analysisProperties.put("sonar.sources", "src");
+
     	
     	es.addGlobalProperties(analysisProperties);
     	System.out.println(es.globalProperties());
     	
     	es.start();
     	es.execute(analysisProperties);
-		
-		// get sonar metrics from 
+    	
+    	// wait for sonarqube results to be fetchable
+    	try {
+    		System.out.println("wait for sonarqube");
+			Thread.sleep(10_000);
+		} catch (InterruptedException e) {
+			System.err.println("wait for sonarqube not successful");
+			e.printStackTrace();
+		}
+    	
+		// get sonar metrics
 		SonarLink s = new SonarLink(sonarConnectionDetails.getDatabaseConnection(), 
 				sonarConnectionDetails.getUsername(), sonarConnectionDetails.getPassword(), includeMetrics);
 		SonarDataSet dataSet = s.fetchProjectMetrics(projectName);
