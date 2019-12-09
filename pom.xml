@@ -62,7 +62,13 @@
     		<artifactId>sonar-scanner-api</artifactId>
     		<version>2.14.0.2002</version>
 		</dependency>
-
+        <dependency>
+            <groupId>aau.iid</groupId>
+            <artifactId>jrazor</artifactId>
+            <version>0.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/jrazor-0.0.1.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

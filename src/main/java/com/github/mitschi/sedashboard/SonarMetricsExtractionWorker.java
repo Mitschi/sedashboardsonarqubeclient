@@ -51,8 +51,8 @@ public class SonarMetricsExtractionWorker implements Runnable{
 //            extractSourceCodeChanges(targetDir);
 
             SonarMetricsAnalyzer sma = new SonarMetricsAnalyzer();
-            SonarConnectionDetails sonarConnectionDetails = new SonarConnectionDetails("jdbc://...","username","password");
-            sma.analyzeCommit(tmpFolder, new File(tmpFolder,"target"),sonarConnectionDetails);
+            SonarConnectionDetails sonarConnectionDetails = new SonarConnectionDetails("jdbc://...","username","password","http://localhost:9000");
+            sma.analyzeCommit(messagingCommit.getCommitId(),tmpFolder, new File(tmpFolder,"target"),sonarConnectionDetails);
 
         }catch(Exception e) {
             System.out.println("ERROR");
